@@ -5,7 +5,7 @@ import { useHanziWriter } from '@/hooks/useHanziWriter';
 import { StarRating } from '@/components/StarRating';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Confetti } from '@/components/Confetti';
-import { ArrowLeft, Play, RotateCcw, ChevronRight, Star, Home } from 'lucide-react';
+import { ArrowLeft, RotateCcw, ChevronRight, Star, Home, Pencil, Eye } from 'lucide-react';
 
 type PracticePhase = 'preview' | 'quiz' | 'result';
 
@@ -26,8 +26,8 @@ export default function PracticePage() {
 
   const { isReady, animateStroke, startQuiz, reset } = useHanziWriter(writerContainerRef, {
     character: currentChar,
-    width: 280,
-    height: 280,
+    width: 320,
+    height: 320,
     strokeColor: '#3E2723',
     outlineColor: '#E0D5C8',
     showHintAfterMisses: 3,
@@ -103,11 +103,17 @@ export default function PracticePage() {
 
   if (chars.length === 0) {
     return (
-      <div className="h-full gradient-warm-bg flex flex-col items-center justify-center px-10 gap-6">
-        <p className="text-xl text-text-secondary font-bold">还没有设置要练习的字</p>
+      <div className="h-full flex flex-col items-center justify-center px-10 gap-6" style={{ backgroundColor: '#FFF8EB' }}>
+        <p className="text-xl font-medium" style={{ color: '#523B2B' }}>还没有设置要练习的字</p>
         <button
           onClick={() => navigate('/settings')}
-          className="btn-touch px-10 py-4 rounded-kid-xl gradient-sunshine text-card-bg text-lg font-bold shadow-button"
+          className="px-10 rounded-full text-lg font-medium text-white"
+          style={{ 
+            backgroundColor: '#FF8800', 
+            paddingTop: '20px',
+            paddingBottom: '20px',
+            boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' 
+          }}
         >
           去设置
         </button>
@@ -116,71 +122,90 @@ export default function PracticePage() {
   }
 
   return (
-    <div className="h-full gradient-warm-bg flex flex-col overflow-hidden">
+    <div className="h-full flex flex-col overflow-hidden" style={{ backgroundColor: '#FFF8EB' }}>
       <Confetti show={showConfetti} />
 
-      <div className="max-w-3xl mx-auto w-full flex flex-col flex-1 overflow-hidden">
-        {/* Header */}
-        <header className="flex items-center justify-between px-8 pt-8 pb-3">
+      {/* Header - 贴顶，只有左下右下圆角 */}
+      <header className="flex items-center bg-white"
+              style={{
+                padding: '16px 24px',
+                gap: '16px',
+                boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)',
+                border: '1px solid #EBDCC8',
+                borderTop: 'none',
+                borderRadius: '0 0 24px 24px',
+              }}>
         <button
           onClick={() => navigate('/')}
-          className="btn-icon bg-card-bg shadow-card"
+          className="w-12 h-12 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: '#FFF8EB', boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' }}
         >
-          <ArrowLeft size={22} className="text-text-secondary" />
+          <ArrowLeft size={24} style={{ color: '#523B2B' }} />
         </button>
-        <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-sunshine/10">
-          <Star size={18} className="fill-star text-star" />
-          <span className="text-base font-bold text-text-primary">{store.totalStars}</span>
+
+        <div className="flex items-center gap-2">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center"
+               style={{ backgroundColor: '#FFF8EB' }}>
+            <Star size={18} className="fill-amber-400 text-amber-400" />
+          </div>
+          <span className="text-base font-medium" style={{ color: '#FF8800' }}>{store.totalStars}</span>
         </div>
       </header>
 
       {/* Progress */}
-      <div className="px-8 pb-4">
+      <div style={{ padding: '0 32px', marginTop: '16px' }}>
         <ProgressBar current={currentIndex + (phase === 'result' ? 1 : 0)} total={chars.length} />
       </div>
 
       {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center px-6 gap-5">
-        {/* Character info */}
-        <div className="text-center animate-[fade-in_0.4s_ease-out]">
-          <span className="text-5xl font-kai font-bold text-text-primary">
-            {currentChar}
-          </span>
-        </div>
+      <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '0 32px', gap: '32px' }}>
+        {/* Prompt Text */}
+        {phase === 'preview' && (
+          <p className="text-2xl font-medium" style={{ color: '#998778' }}>
+            一起来认识新字✨！
+          </p>
+        )}
 
-        {/* Writer Area - 田字格 */}
+        {/* Writer Area */}
         <div className="relative">
           <div
-            className="tian-zi-ge rounded-kid-lg overflow-hidden bg-card-bg"
-            style={{ width: 280, height: 280 }}
+            className="rounded-3xl overflow-hidden bg-white"
+            style={{
+              width: 320,
+              height: 320,
+              border: '1px solid #EBDCC8',
+              boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)'
+            }}
           >
-            <div ref={writerContainerRef} className="w-full h-full" />
+            {/* Tianzi grid background */}
+            <div className="absolute inset-0 pointer-events-none"
+                 style={{
+                   backgroundImage: `
+                     linear-gradient(to right, transparent 49.5%, #E8D5B7 49.5%, #E8D5B7 50.5%, transparent 50.5%),
+                     linear-gradient(to bottom, transparent 49.5%, #E8D5B7 49.5%, #E8D5B7 50.5%, transparent 50.5%),
+                     linear-gradient(to bottom right, transparent calc(50% - 0.5px), #E8D5B7 calc(50% - 0.5px), #E8D5B7 calc(50% + 0.5px), transparent calc(50% + 0.5px)),
+                     linear-gradient(to bottom left, transparent calc(50% - 0.5px), #E8D5B7 calc(50% - 0.5px), #E8D5B7 calc(50% + 0.5px), transparent calc(50% + 0.5px))
+                   `
+                 }}
+            />
+            <div ref={writerContainerRef} className="w-full h-full relative z-10" />
           </div>
-
-          {/* Phase indicator */}
-          {phase === 'quiz' && (
-            <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-pill bg-sky text-card-bg text-sm font-bold shadow-sm">
-              跟着写吧！
-            </div>
-          )}
-          {phase === 'quiz' && mistakes > 0 && (
-            <div className="absolute -bottom-3.5 left-1/2 -translate-x-1/2 px-4 py-1.5 rounded-pill bg-coral/90 text-card-bg text-sm font-bold">
-              错误 {mistakes} 次
-            </div>
-          )}
         </div>
 
         {/* Stroke progress during quiz */}
         {phase === 'quiz' && strokeProgress.total > 0 && (
-          <div className="flex items-center gap-1.5 py-2">
+          <div className="flex items-center gap-2 py-2">
             {Array.from({ length: strokeProgress.total }).map((_, i) => (
               <div
                 key={i}
-                className={`w-3.5 h-3.5 rounded-full transition-all duration-300 ${
+                className={`w-3 h-3 rounded-full transition-all duration-300 ${
                   i < strokeProgress.done
-                    ? 'bg-growth scale-110'
-                    : 'bg-card-border'
+                    ? 'scale-110'
+                    : ''
                 }`}
+                style={{
+                  backgroundColor: i < strokeProgress.done ? '#FF8800' : '#FFE5B4'
+                }}
               />
             ))}
           </div>
@@ -190,10 +215,10 @@ export default function PracticePage() {
         {phase === 'result' && (
           <div className="flex flex-col items-center gap-4 animate-[bounce-in_0.5s_cubic-bezier(0.68,-0.55,0.265,1.55)]">
             <StarRating stars={earnedStars} size={44} animated />
-            <p className="text-xl font-bold text-text-primary">
+            <p className="text-xl font-medium" style={{ color: '#523B2B' }}>
               {earnedStars === 3 ? '太棒了！完美！' : earnedStars === 2 ? '很不错！继续加油！' : '加油，再来一次！'}
             </p>
-            <p className="text-base text-text-muted">
+            <p className="text-base" style={{ color: '#998778' }}>
               获得 {earnedStars} 颗星 · 错误 {mistakes} 次
             </p>
           </div>
@@ -201,56 +226,89 @@ export default function PracticePage() {
       </div>
 
       {/* Action Buttons */}
-      <div className="px-8 pb-10 pt-4">
+      <div style={{ padding: '16px 32px 32px' }}>
         {phase === 'preview' && (
           <div className="flex gap-4">
             <button
               onClick={handleAnimate}
               disabled={!isReady}
-              className="btn-touch flex-1 py-4.5 rounded-kid-xl gradient-sky text-card-bg font-bold text-lg
-                         shadow-sm flex items-center justify-center gap-2.5
+              className="flex-1 rounded-full font-medium text-lg flex items-center justify-center gap-2
                          disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: '#FFFFFF',
+                color: '#FF8800',
+                border: '1px solid #EBDCC8',
+                paddingTop: '20px',
+                paddingBottom: '20px',
+                boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)'
+              }}
             >
-              <Play size={22} />
+              <Eye size={22} />
               看笔顺
             </button>
             <button
               onClick={handleStartQuiz}
               disabled={!isReady}
-              className="btn-touch flex-1 py-4.5 rounded-kid-xl gradient-sunshine text-card-bg font-bold text-lg
-                         shadow-button flex items-center justify-center gap-2.5
+              className="flex-1 rounded-full font-medium text-lg text-white flex items-center justify-center gap-2
                          disabled:opacity-50 disabled:cursor-not-allowed"
+              style={{
+                backgroundColor: '#FF8800',
+                paddingTop: '20px',
+                paddingBottom: '20px',
+                boxShadow: '0px 8px 0px 0px rgba(230, 110, 0, 0.2), inset 0px -4px 0px 0px rgba(245, 73, 0, 1)'
+              }}
             >
+              <Pencil size={22} />
               开始写
             </button>
           </div>
         )}
 
         {phase === 'quiz' && (
-          <button
-            onClick={handleRetry}
-            className="btn-touch w-full py-4.5 rounded-kid-xl bg-card-bg border-2 border-card-border text-text-secondary font-bold text-lg
-                       flex items-center justify-center gap-2.5"
-          >
-            <RotateCcw size={22} />
-            重新开始
-          </button>
+          <div className="flex justify-center">
+            <button
+              onClick={handleRetry}
+              className="w-1/2 rounded-full font-medium text-lg flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: '#FFFFFF',
+                color: '#523B2B',
+                border: '1px solid #EBDCC8',
+                paddingTop: '20px',
+                paddingBottom: '20px',
+                boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)'
+              }}
+            >
+              <RotateCcw size={22} />
+              重新开始
+            </button>
+          </div>
         )}
 
         {phase === 'result' && (
           <div className="flex gap-4">
             <button
               onClick={handleRetry}
-              className="btn-touch flex-1 py-4.5 rounded-kid-xl bg-card-bg border-2 border-card-border text-text-secondary font-bold text-lg
-                         flex items-center justify-center gap-2.5"
+              className="flex-1 rounded-full font-medium text-lg flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: '#FFFFFF',
+                color: '#523B2B',
+                border: '2px solid #EBDCC8',
+                paddingTop: '20px',
+                paddingBottom: '20px'
+              }}
             >
               <RotateCcw size={20} />
               再写一次
             </button>
             <button
               onClick={handleNext}
-              className="btn-touch flex-1 py-4.5 rounded-kid-xl gradient-sunshine text-card-bg font-bold text-lg
-                         shadow-button flex items-center justify-center gap-2.5"
+              className="flex-1 rounded-full font-medium text-lg text-white flex items-center justify-center gap-2"
+              style={{
+                backgroundColor: '#FF8800',
+                paddingTop: '20px',
+                paddingBottom: '20px',
+                boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)'
+              }}
             >
               {currentIndex < chars.length - 1 ? (
                 <>
@@ -266,7 +324,6 @@ export default function PracticePage() {
             </button>
           </div>
         )}
-      </div>
       </div>
     </div>
   );

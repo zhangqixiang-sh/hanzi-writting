@@ -1,94 +1,138 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
-import { BookOpen, Settings, Star, Flame } from 'lucide-react';
+import { Settings, Star, Flame, BookOpen, Award } from 'lucide-react';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const store = useStore();
 
   const masteredCount = Object.values(store.progress).filter((p) => p.bestStars >= 2).length;
+  const pendingCount = store.characters.length;
 
   return (
-    <div className="h-full gradient-warm-bg flex flex-col overflow-hidden">
-      <div className="max-w-3xl mx-auto w-full flex flex-col flex-1 overflow-hidden">
-        {/* Header */}
-        <header className="flex items-center justify-between px-8 pt-8 pb-4">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-sunshine/10">
-            <Star size={20} className="fill-star text-star" />
-            <span className="text-base font-bold text-sunshine-dark">{store.totalStars}</span>
+    <div className="h-full flex flex-col overflow-hidden" style={{ backgroundColor: '#FFF8EB', padding: '32px' }}>
+      {/* Header */}
+      <header className="flex items-center justify-between pb-4">
+        {/* Star Counter */}
+        <div className="flex items-center rounded-full bg-white shadow-sm"
+             style={{
+               border: '1px solid #EBDCC8',
+               paddingTop: '8px',
+               paddingBottom: '8px',
+               paddingLeft: '16px',
+               paddingRight: '16px'
+             }}>
+          <div style={{ marginRight: '8px' }}>
+            <Star size={20} className="fill-amber-400 text-amber-400" />
           </div>
-          <div className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-coral/10">
-            <Flame size={20} className="text-coral" />
-            <span className="text-base font-bold text-coral">{store.streakDays}天</span>
-          </div>
+          <span className="text-lg font-medium" style={{ color: '#523B2B' }}>{store.totalStars}</span>
         </div>
+
+        {/* Settings Button */}
         <button
           onClick={() => navigate('/settings')}
-          className="btn-icon bg-card-bg shadow-card"
+          className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-sm"
+          style={{ border: '1px solid #EBDCC8' }}
         >
-          <Settings size={22} className="text-text-secondary" />
+          <Settings size={24} style={{ color: '#998778' }} />
         </button>
       </header>
 
-      {/* Hero */}
-      <div className="flex-1 flex flex-col items-center justify-center px-8 gap-8">
-        {/* Mascot */}
-        <div className="animate-[float_3s_ease-in-out_infinite]">
-          <img
-            src="/images/hero-fox.png"
-            alt="字趣小狐狸"
-            className="w-48 h-48 object-contain drop-shadow-lg"
-          />
+      {/* Main Content */}
+      <div className="flex-1 flex flex-col items-center justify-center gap-6">
+        {/* Fox Emoji */}
+        <div className="text-[120px] leading-none animate-[float_3s_ease-in-out_infinite]">
+          🦊
         </div>
 
         {/* Title */}
-        <div className="text-center">
-          <h1 className="text-5xl font-black text-text-primary tracking-wide">
-            字<span className="text-sunshine">趣</span>
-          </h1>
-          <p className="text-text-muted mt-2 text-lg">让写字变成一场冒险</p>
+        <h1 className="text-6xl font-medium" style={{ color: '#FF8800', textShadow: '0px 4px 0px rgba(230, 110, 0, 0.4)' }}>
+          字趣
+        </h1>
+
+        {/* Tagline */}
+        <div className="rounded-full bg-white/80 shadow-sm"
+             style={{ paddingTop: '7px', paddingBottom: '7px', paddingLeft: '22px', paddingRight: '22px' }}>
+          <p className="text-xl" style={{ color: '#998778' }}>让写字变成一场冒险！✨</p>
         </div>
 
-        {/* Stats */}
-        <div className="flex items-center gap-8 mt-2">
-          <div className="text-center">
-            <p className="text-3xl font-black text-sky">{store.characters.length}</p>
-            <p className="text-sm text-text-muted mt-1">待练习</p>
-          </div>
-          <div className="w-px h-10 bg-card-border" />
-          <div className="text-center">
-            <p className="text-3xl font-black text-growth">{masteredCount}</p>
-            <p className="text-sm text-text-muted mt-1">已掌握</p>
-          </div>
-          <div className="w-px h-10 bg-card-border" />
-          <div className="text-center">
-            <p className="text-3xl font-black text-sunshine">{store.totalStars}</p>
-            <p className="text-sm text-text-muted mt-1">总星星</p>
-          </div>
-        </div>
+        {/* Spacer */}
+        <div className="h-4" />
 
-        {/* Main CTA */}
+        {/* Primary Button - 开始练字 */}
         <button
           onClick={() => navigate('/practice')}
-          className="btn-touch mt-4 w-72 py-5 rounded-kid-xl gradient-sunshine text-card-bg text-xl font-bold shadow-button
-                     hover:shadow-glow flex items-center justify-center gap-3"
+          className="w-80 rounded-3xl text-white text-2xl font-medium flex items-center justify-center gap-3 shadow-lg"
+          style={{
+            backgroundColor: '#FF8800',
+            paddingTop: '24px',
+            paddingBottom: '24px',
+            boxShadow: '0px 8px 0px 0px rgba(230, 110, 0, 0.2), inset 0px -6px 0px 0px rgba(245, 73, 0, 1)'
+          }}
         >
-          <BookOpen size={26} />
+          <BookOpen size={28} />
           开始练字
         </button>
 
-        {/* Secondary actions */}
+        {/* Secondary Button - 设置练习的字 */}
         <button
           onClick={() => navigate('/settings')}
-          className="btn-touch px-6 py-3 text-base text-text-muted underline underline-offset-4 decoration-dashed"
+          className="w-80 rounded-full text-xl font-medium flex items-center justify-center gap-2"
+          style={{
+            backgroundColor: '#FFFFFF',
+            color: '#FF8800',
+            border: '2px solid #EBDCC8',
+            paddingTop: '17px',
+            paddingBottom: '17px',
+            boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)'
+          }}
         >
           设置练习的字
         </button>
       </div>
 
-      {/* Bottom safe area */}
-      <div className="pb-8" />
+      {/* Bottom Stats Cards */}
+      <div className="pb-2">
+        <div className="flex items-center justify-center gap-5">
+          {/* 待练习字数 */}
+          <div className="flex-1 max-w-[280px] p-4 rounded-3xl bg-white flex items-center gap-4"
+               style={{ border: '1px solid #EBDCC8', boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' }}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                 style={{ backgroundColor: '#DBEAFE' }}>
+              <BookOpen size={24} style={{ color: '#1E88E5' }} />
+            </div>
+            <div>
+              <p className="text-sm uppercase tracking-wide" style={{ color: '#998778' }}>待练习字数</p>
+              <p className="text-2xl font-medium" style={{ color: '#523B2B' }}>{pendingCount}</p>
+            </div>
+          </div>
+
+          {/* 已掌握字数 */}
+          <div className="flex-1 max-w-[280px] p-4 rounded-3xl bg-white flex items-center gap-4"
+               style={{ border: '1px solid #EBDCC8', boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' }}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                 style={{ backgroundColor: '#DCFCE7' }}>
+              <Award size={24} style={{ color: '#22C55E' }} />
+            </div>
+            <div>
+              <p className="text-sm uppercase tracking-wide" style={{ color: '#998778' }}>已掌握字数</p>
+              <p className="text-2xl font-medium" style={{ color: '#523B2B' }}>{masteredCount}</p>
+            </div>
+          </div>
+
+          {/* 连续燃烧 */}
+          <div className="flex-1 max-w-[280px] p-4 rounded-3xl bg-white flex items-center gap-4"
+               style={{ border: '1px solid #EBDCC8', boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' }}>
+            <div className="w-12 h-12 rounded-full flex items-center justify-center"
+                 style={{ backgroundColor: '#FFEDD4' }}>
+              <Flame size={24} style={{ color: '#F97316' }} />
+            </div>
+            <div>
+              <p className="text-sm uppercase tracking-wide" style={{ color: '#998778' }}>连续燃烧</p>
+              <p className="text-2xl font-medium" style={{ color: '#523B2B' }}>{store.streakDays}天!</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

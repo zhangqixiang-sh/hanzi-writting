@@ -43,7 +43,7 @@ export function useHanziWriter(
       const writer = HanziWriter.create(containerRef.current, character, {
         width,
         height,
-        padding: 12,
+        padding: 0,
         showOutline,
         strokeColor,
         outlineColor,

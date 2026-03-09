@@ -1,14 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore, setCharacters } from '@/store';
-import { ArrowLeft, Plus, X, Trash2, RotateCcw } from 'lucide-react';
-
-const DEFAULT_CHARACTERS = ['大', '小', '上', '下', '人', '口', '手', '日', '月', '水'];
+import { ArrowLeft, Plus, X, Star, Save } from 'lucide-react';
 
 const PRESET_GROUPS = [
-  { label: '一年级上', chars: '一二三四五六七八九十天地人你我他大小多少' },
-  { label: '一年级下', chars: '春风花飞入姓什么双国王方青清气晴情请生字左右红时动万' },
-  { label: '常用字', chars: '的了是不在有这个上中下大小人我他出来到要说对可里面开好很' },
+  { label: '一年级上册', chars: '一二三四五六七八九十天地人你我他大小多少', icon: '📚' },
+  { label: '一年级下册', chars: '春风花飞入姓什么双国王方青清气晴情请生字左右红时动万', icon: '📖' },
+  { label: '基础常用字', chars: '的了是不在有这个上中下大小人我他出来到要说对可里面开好很', icon: '✏️' },
 ];
 
 export default function SettingsPage() {
@@ -17,12 +15,12 @@ export default function SettingsPage() {
   const [inputValue, setInputValue] = useState('');
   const [chars, setChars] = useState<string[]>([...store.characters]);
 
+  const masteredCount = Object.values(store.progress).filter((p) => p.bestStars >= 2).length;
+
   const handleAddChars = () => {
     if (!inputValue.trim()) return;
-    // Extract only Chinese characters
     const newChars = inputValue.match(/[\u4e00-\u9fff]/g) || [];
     if (newChars.length === 0) return;
-    // Deduplicate
     const merged = [...new Set([...chars, ...newChars])];
     setChars(merged);
     setInputValue('');
@@ -42,151 +40,268 @@ export default function SettingsPage() {
     setChars([]);
   };
 
-  const handleReset = () => {
-    setChars([...DEFAULT_CHARACTERS]);
-  };
-
   const handleSave = () => {
     setCharacters(chars);
     navigate(-1);
   };
 
-  const hasChanges = JSON.stringify(chars) !== JSON.stringify(store.characters);
-
   return (
-    <div className="h-full gradient-warm-bg flex flex-col overflow-hidden">
-      <div className="max-w-3xl mx-auto w-full flex flex-col flex-1 overflow-hidden">
-        {/* Header */}
-        <header className="flex items-center justify-between px-8 pt-8 pb-4">
+    <div
+      className="h-full flex flex-col overflow-hidden"
+      style={{ backgroundColor: '#FFF8EB' }}
+    >
+      {/* Header - 贴顶，只有左下右下圆角 */}
+      <header
+        className="flex items-center justify-between bg-white"
+        style={{
+          padding: '16px 24px',
+          boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)',
+          border: '1px solid #EBDCC8',
+          borderTop: 'none',
+          borderRadius: '0 0 24px 24px',
+        }}
+      >
         <button
           onClick={() => navigate(-1)}
-          className="btn-icon bg-card-bg shadow-card"
+          className="w-12 h-12 rounded-full flex items-center justify-center"
+          style={{ backgroundColor: '#FFF8EB', boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' }}
         >
-          <ArrowLeft size={22} className="text-text-secondary" />
+          <ArrowLeft size={24} style={{ color: '#523B2B' }} />
         </button>
-        <h1 className="text-xl font-bold text-text-primary">设置练习的字</h1>
-        <button
-          onClick={handleSave}
-          disabled={!hasChanges}
-          className={`btn-touch px-6 py-3 rounded-pill text-base font-bold transition-all
-            ${hasChanges
-              ? 'gradient-sunshine text-card-bg shadow-button'
-              : 'bg-card-border text-text-muted cursor-not-allowed'}`}
-        >
-          保存
-        </button>
+
+        <div className="flex items-center" style={{ gap: '8px' }}>
+          <div
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{ backgroundColor: '#FFF8EB' }}
+          >
+            <Star size={18} className="fill-amber-400 text-amber-400" />
+          </div>
+          <span className="text-base font-medium" style={{ color: '#FF8800' }}>
+            {store.totalStars}
+          </span>
+        </div>
       </header>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto px-8 pb-8 space-y-8">
-        {/* Input Area */}
-        <div className="card-section">
-          <label className="text-base font-bold text-text-primary block mb-2">
-            输入要练习的汉字
-          </label>
-          <p className="text-sm text-text-muted mb-4">
-            可以一次输入多个汉字，如 "春天花开"，系统会自动拆分
-          </p>
-          <div className="flex gap-3">
-            <input
-              type="text"
-              value={inputValue}
-              onChange={(e) => setInputValue(e.target.value)}
-              onKeyDown={(e) => e.key === 'Enter' && handleAddChars()}
-              placeholder="在这里输入汉字..."
-              className="flex-1 px-5 py-3.5 rounded-kid bg-bg-warm border-2 border-card-border
-                         text-text-primary text-lg placeholder:text-text-muted
-                         focus:outline-none focus:border-sunshine transition-colors font-kai"
-            />
-            <button
-              onClick={handleAddChars}
-              className="btn-touch w-14 h-14 rounded-kid gradient-sunshine text-card-bg shadow-button"
-            >
-              <Plus size={26} />
-            </button>
-          </div>
-        </div>
-
-        {/* Preset Groups */}
-        <div className="card-section">
-          <label className="text-base font-bold text-text-primary block mb-5">
-            快速添加常用字
-          </label>
-          <div className="flex flex-wrap gap-3">
-            {PRESET_GROUPS.map((group) => (
-              <button
-                key={group.label}
-                onClick={() => handleAddPreset(group.chars)}
-                className="btn-touch !px-6 !py-2 rounded-pill bg-sky/10 text-sky-dark text-base font-bold
-                           border border-sky/20 !min-h-0"
+      <div
+        className="flex-1 overflow-y-auto"
+        style={{ padding: '24px 32px' }}
+      >
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
+          {/* Section 1: Input */}
+          <div
+            className="rounded-3xl bg-white"
+            style={{
+              padding: '32px',
+              border: '1px solid #EBDCC8',
+              boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)',
+            }}
+          >
+            {/* Section Header */}
+            <div className="flex items-center" style={{ gap: '12px', marginBottom: '12px' }}>
+              <div
+                className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
+                style={{ backgroundColor: 'rgba(255, 136, 0, 0.2)', color: '#FF8800' }}
               >
-                + {group.label}
-              </button>
-            ))}
-          </div>
-        </div>
+                1
+              </div>
+              <h2 className="text-xl font-medium" style={{ color: '#523B2B' }}>
+                输入要练习的汉字
+              </h2>
+            </div>
 
-        {/* Current Characters */}
-        <div className="card-section">
-          <div className="flex items-center justify-between mb-4">
-            <label className="text-base font-bold text-text-primary">
-              当前练习列表 ({chars.length}个字)
-            </label>
-            <div className="flex items-center gap-1">
-              <button
-                onClick={handleReset}
-                className="btn-icon w-11 h-11 text-text-muted hover:bg-sky/10"
-                title="恢复默认"
+            {/* Hint */}
+            <div className="flex items-center" style={{ gap: '8px', marginBottom: '24px' }}>
+              <div
+                className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
+                style={{ backgroundColor: '#EBDCC8' }}
               >
-                <RotateCcw size={20} />
+                <span className="text-xs" style={{ color: '#998778' }}>i</span>
+              </div>
+              <p className="text-sm" style={{ color: '#998778' }}>
+                支持一次输入多个汉字，例如"春天花开"，系统会自动拆分。
+              </p>
+            </div>
+
+            {/* Input Area */}
+            <div className="flex" style={{ gap: '16px', marginBottom: '24px' }}>
+              <input
+                type="text"
+                value={inputValue}
+                onChange={(e) => setInputValue(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddChars()}
+                placeholder="在这里输入汉字..."
+                className="flex-1 rounded-full text-lg"
+                style={{
+                  backgroundColor: '#F5EDDE',
+                  border: '1px solid #EBDCC8',
+                  color: '#523B2B',
+                  padding: '12px 24px',
+                  opacity: inputValue ? 1 : 0.5,
+                }}
+              />
+              <button
+                onClick={handleAddChars}
+                className="rounded-full text-base font-medium text-white flex items-center flex-shrink-0"
+                style={{
+                  backgroundColor: '#FF8800',
+                  padding: '12px 24px',
+                  gap: '8px',
+                  opacity: inputValue ? 1 : 0.5,
+                }}
+              >
+                <Plus size={20} />
+                添加
               </button>
+            </div>
+
+            {/* Divider */}
+            <div style={{ borderTop: '1px solid #EBDCC8', marginBottom: '24px' }} />
+
+            {/* Quick Add */}
+            <div>
+              <p className="text-xs uppercase tracking-wider" style={{ color: '#998778', marginBottom: '16px' }}>
+                快速添加常见字库
+              </p>
+              <div className="flex flex-wrap" style={{ gap: '12px' }}>
+                {PRESET_GROUPS.map((group) => (
+                  <button
+                    key={group.label}
+                    onClick={() => handleAddPreset(group.chars)}
+                    className="rounded-full text-base font-medium flex items-center"
+                    style={{
+                      backgroundColor: 'rgba(255, 204, 0, 0.1)',
+                      border: '1px solid rgba(255, 204, 0, 0.3)',
+                      color: '#995E00',
+                      padding: '10px 20px',
+                      gap: '8px',
+                    }}
+                  >
+                    <Plus size={16} />
+                    {group.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Section 2: Current List */}
+          <div
+            className="rounded-3xl bg-white"
+            style={{
+              padding: '32px',
+              border: '1px solid #EBDCC8',
+              boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)',
+            }}
+          >
+            {/* Section Header */}
+            <div className="flex items-center justify-between" style={{ marginBottom: '20px' }}>
+              <div>
+                <div className="flex items-center" style={{ gap: '12px', marginBottom: '8px' }}>
+                  <div
+                    className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium"
+                    style={{ backgroundColor: 'rgba(255, 136, 0, 0.2)', color: '#FF8800' }}
+                  >
+                    2
+                  </div>
+                  <h2 className="text-xl font-medium" style={{ color: '#523B2B' }}>
+                    当前练习列表
+                  </h2>
+                </div>
+                <p className="text-sm" style={{ color: '#998778', marginLeft: '44px' }}>
+                  共{chars.length}个汉字 ({masteredCount}个已掌握)
+                </p>
+              </div>
               <button
                 onClick={handleClearAll}
-                className="btn-icon w-11 h-11 text-text-muted hover:bg-error/10"
-                title="清空全部"
+                className="rounded-full text-sm font-medium"
+                style={{ color: '#FF5A5A', padding: '8px 16px' }}
               >
-                <Trash2 size={20} />
+                清空全部
               </button>
             </div>
-          </div>
-          
-          {chars.length === 0 ? (
-            <p className="text-center text-text-muted text-base py-10">
-              还没有添加任何字，快来添加吧！
-            </p>
-          ) : (
-            <div className="flex flex-wrap gap-3">
-              {chars.map((char) => {
-                const progress = store.progress[char];
-                return (
-                  <div
-                    key={char}
-                    className="group relative w-14 h-14 rounded-kid bg-bg-warm border-2 border-card-border
-                               flex items-center justify-center font-kai text-2xl text-text-primary
-                               transition-all hover:border-coral hover:shadow-sm"
-                  >
-                    {char}
-                    {progress && progress.bestStars > 0 && (
-                      <div className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-star
-                                      flex items-center justify-center text-[10px] font-bold text-card-bg">
-                        {progress.bestStars}
+
+            {/* Character Cards */}
+            {chars.length === 0 ? (
+              <p className="text-center" style={{ color: '#998778', padding: '40px 0' }}>
+                还没有添加任何字，快来添加吧！
+              </p>
+            ) : (
+              <div className="flex flex-wrap" style={{ gap: '16px' }}>
+                {chars.map((char) => {
+                  const progress = store.progress[char];
+                  const isMastered = progress && progress.bestStars >= 2;
+                  return (
+                    <div key={char} className="relative group">
+                      <div
+                        className="flex items-center justify-center text-3xl font-medium"
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          borderRadius: '24px',
+                          backgroundColor: '#FFFFFF',
+                          border: '1px solid #EBDCC8',
+                          boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)',
+                          color: '#523B2B',
+                          fontFamily: 'KaiTi, STKaiti, Kai, 楷体, serif',
+                        }}
+                      >
+                        {char}
+                        <div
+                          className="absolute inset-0 pointer-events-none"
+                          style={{
+                            opacity: 0.1,
+                            backgroundImage: `
+                              linear-gradient(to right, transparent 49.5%, #000 49.5%, #000 50.5%, transparent 50.5%),
+                              linear-gradient(to bottom, transparent 49.5%, #000 49.5%, #000 50.5%, transparent 50.5%)
+                            `,
+                            borderRadius: '24px',
+                          }}
+                        />
                       </div>
-                    )}
-                    <button
-                      onClick={() => handleRemoveChar(char)}
-                      className="absolute -top-2 -right-2 w-6 h-6 rounded-full bg-error text-card-bg
-                                 flex items-center justify-center opacity-0 group-hover:opacity-100
-                                 transition-opacity active:scale-90"
-                    >
-                      <X size={14} />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
+
+                      {isMastered && (
+                        <div
+                          className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center"
+                          style={{ backgroundColor: '#FFCC00', boxShadow: '0px 1px 2px rgba(0,0,0,0.1)' }}
+                        >
+                          <Star size={12} className="fill-white text-white" />
+                        </div>
+                      )}
+
+                      <button
+                        onClick={() => handleRemoveChar(char)}
+                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                        style={{ backgroundColor: '#FF5A5A', color: 'white' }}
+                      >
+                        <X size={12} />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </div>
         </div>
-        </div>
+      </div>
+
+      {/* Save Button */}
+      <div className="flex justify-center" style={{ padding: '16px 32px 32px' }}>
+        <button
+          onClick={handleSave}
+          className="rounded-full text-lg font-medium flex items-center justify-center"
+          style={{
+            backgroundColor: '#F5EDDE',
+            color: '#998778',
+            border: '1px solid #EBDCC8',
+            padding: '18px 64px',
+            gap: '12px',
+            boxShadow: '0px 8px 0px 0px rgba(230, 110, 0, 0.2)',
+          }}
+        >
+          <Save size={22} />
+          保存设置
+        </button>
       </div>
     </div>
   );

@@ -7,7 +7,7 @@ export function ProgressBar({ current, total }: ProgressBarProps) {
   const percent = total > 0 ? Math.round((current / total) * 100) : 0;
   
   return (
-    <div className="w-full">
+    <div className="w-full" style={{ paddingTop: '16px' }}>
       <div className="flex items-center justify-between mb-1.5">
         <span className="text-base font-medium text-text-secondary">
           进度 {current}/{total}
