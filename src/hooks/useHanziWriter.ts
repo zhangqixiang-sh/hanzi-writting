@@ -31,11 +31,19 @@ export function useHanziWriter(
     drawingColor = '#3E2723',
   } = options;
 
-  // Initialize
+  // Initialize or update when character changes
   useEffect(() => {
     if (!containerRef.current || !character) return;
 
-    // Clean up previous
+    // Clean up previous instance properly
+    if (writerRef.current) {
+      try {
+        writerRef.current.cancelQuiz();
+        writerRef.current = null;
+      } catch (e) {
+        console.warn('Error cleaning up previous writer:', e);
+      }
+    }
     containerRef.current.innerHTML = '';
     setIsReady(false);
 
@@ -56,14 +64,21 @@ export function useHanziWriter(
 
       writerRef.current = writer;
       setIsReady(true);
-    } catch {
-      console.warn(`Failed to create HanziWriter for: ${character}`);
+    } catch (e) {
+      console.warn(`Failed to create HanziWriter for: ${character}`, e);
     }
 
     return () => {
-      writerRef.current = null;
+      if (writerRef.current) {
+        try {
+          writerRef.current.cancelQuiz();
+        } catch (e) {
+          // Ignore errors during cleanup
+        }
+        writerRef.current = null;
+      }
     };
-  }, [character, width, height, showOutline, strokeColor, outlineColor]);
+  }, [character, width, height, showOutline, strokeColor, outlineColor, drawingColor]);
 
   // Animate stroke order
   const animateStroke = useCallback(() => {

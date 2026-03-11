@@ -157,17 +157,19 @@ export default function PracticePage() {
         <ProgressBar current={currentIndex + (phase === 'result' ? 1 : 0)} total={chars.length} />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 flex flex-col items-center justify-center" style={{ padding: '0 32px', gap: '32px' }}>
-        {/* Prompt Text */}
-        {phase === 'preview' && (
-          <p className="text-2xl font-medium" style={{ color: '#998778' }}>
-            一起来认识新字✨！
-          </p>
-        )}
+      {/* Content - 三段式布局，卡片位置固定 */}
+      <div className="flex-1 flex flex-col items-center overflow-hidden" style={{ padding: '0 32px' }}>
+        {/* Top zone - 固定高度，用于提示文字 */}
+        <div className="flex-shrink-0 flex items-end justify-center" style={{ height: 56 }}>
+          {phase === 'preview' && (
+            <p className="text-2xl font-medium" style={{ color: '#998778' }}>
+              一起来认识新字✨！
+            </p>
+          )}
+        </div>
 
-        {/* Writer Area */}
-        <div className="relative">
+        {/* Middle zone - 田字格卡片，始终居中 */}
+        <div className="relative flex-shrink-0" style={{ marginTop: 16 }}>
           <div
             className="rounded-3xl overflow-hidden bg-white"
             style={{
@@ -192,37 +194,40 @@ export default function PracticePage() {
           </div>
         </div>
 
-        {/* Stroke progress during quiz */}
-        {phase === 'quiz' && strokeProgress.total > 0 && (
-          <div className="flex items-center gap-2 py-2">
-            {Array.from({ length: strokeProgress.total }).map((_, i) => (
-              <div
-                key={i}
-                className={`w-3 h-3 rounded-full transition-all duration-300 ${
-                  i < strokeProgress.done
-                    ? 'scale-110'
-                    : ''
-                }`}
-                style={{
-                  backgroundColor: i < strokeProgress.done ? '#FF8800' : '#FFE5B4'
-                }}
-              />
-            ))}
-          </div>
-        )}
+        {/* Bottom zone - 弹性空间，笔画进度/结果展示 */}
+        <div className="flex-1 flex flex-col items-center justify-start" style={{ marginTop: 24 }}>
+          {/* Stroke progress during quiz */}
+          {phase === 'quiz' && strokeProgress.total > 0 && (
+            <div className="flex items-center gap-2 py-2">
+              {Array.from({ length: strokeProgress.total }).map((_, i) => (
+                <div
+                  key={i}
+                  className={`w-3 h-3 rounded-full transition-all duration-300 ${
+                    i < strokeProgress.done
+                      ? 'scale-110'
+                      : ''
+                  }`}
+                  style={{
+                    backgroundColor: i < strokeProgress.done ? '#FF8800' : '#FFE5B4'
+                  }}
+                />
+              ))}
+            </div>
+          )}
 
-        {/* Result */}
-        {phase === 'result' && (
-          <div className="flex flex-col items-center gap-4 animate-[bounce-in_0.5s_cubic-bezier(0.68,-0.55,0.265,1.55)]">
-            <StarRating stars={earnedStars} size={44} animated />
-            <p className="text-xl font-medium" style={{ color: '#523B2B' }}>
-              {earnedStars === 3 ? '太棒了！完美！' : earnedStars === 2 ? '很不错！继续加油！' : '加油，再来一次！'}
-            </p>
-            <p className="text-base" style={{ color: '#998778' }}>
-              获得 {earnedStars} 颗星 · 错误 {mistakes} 次
-            </p>
-          </div>
-        )}
+          {/* Result */}
+          {phase === 'result' && (
+            <div className="flex flex-col items-center gap-4 animate-[bounce-in_0.5s_cubic-bezier(0.68,-0.55,0.265,1.55)]">
+              <StarRating stars={earnedStars} size={44} animated />
+              <p className="text-xl font-medium" style={{ color: '#523B2B' }}>
+                {earnedStars === 3 ? '太棒了！完美！' : earnedStars === 2 ? '很不错！继续加油！' : '加油，再来一次！'}
+              </p>
+              <p className="text-base" style={{ color: '#998778' }}>
+                获得 {earnedStars} 颗星 · 错误 {mistakes} 次
+              </p>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Action Buttons */}
