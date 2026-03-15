@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import path from 'path'
 
 export default defineConfig({
-  base: '/hanzi_writting/',
+  base: '/hanzi-writting/',
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
