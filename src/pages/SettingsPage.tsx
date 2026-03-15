@@ -3,12 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useStore, setCharacters } from '@/store';
 import { useSoundManager } from '@/hooks/useSoundManager';
 import { ArrowLeft, Plus, X, Star, Save, Volume2, VolumeX } from 'lucide-react';
+import charactersData from '@/data/characters.json';
 
-const PRESET_GROUPS = [
-  { label: '一年级上册', chars: '一二三四五六七八九十天地人你我他大小多少', icon: '📚' },
-  { label: '一年级下册', chars: '春风花飞入姓什么双国王方青清气晴情请生字左右红时动万', icon: '📖' },
-  { label: '基础常用字', chars: '的了是不在有这个上中下大小人我他出来到要说对可里面开好很', icon: '✏️' },
-];
+const PRESET_GROUPS = charactersData.presetGroups;
 
 export default function SettingsPage() {
   const navigate = useNavigate();
