@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'sonner';
 import HomePage from '@/pages/HomePage';
 import PracticePage from '@/pages/PracticePage';
@@ -6,7 +6,7 @@ import SettingsPage from '@/pages/SettingsPage';
 
 function App() {
   return (
-    <BrowserRouter>
+    <HashRouter>
       <div className="h-screen w-screen overflow-hidden bg-bg-page">
         <Routes>
           <Route path="/" element={<HomePage />} />
@@ -15,7 +15,7 @@ function App() {
         </Routes>
       </div>
       <Toaster position="top-center" richColors />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
