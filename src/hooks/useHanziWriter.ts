@@ -113,10 +113,10 @@ export function useHanziWriter(
     [options.showHintAfterMisses, options.highlightOnComplete, options.leniency]
   );
 
-  // Reset - show character
+  // Reset - hide character for quiz
   const reset = useCallback(() => {
     if (!writerRef.current) return;
-    writerRef.current.showCharacter();
+    writerRef.current.hideCharacter();
     writerRef.current.showOutline();
     writerRef.current.cancelQuiz();
   }, []);
