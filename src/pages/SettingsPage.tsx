@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore, setCharacters } from '@/store';
-import { ArrowLeft, Plus, X, Star, Save } from 'lucide-react';
+import { useSoundManager } from '@/hooks/useSoundManager';
+import { ArrowLeft, Plus, X, Star, Save, Volume2, VolumeX } from 'lucide-react';
 
 const PRESET_GROUPS = [
   { label: '一年级上册', chars: '一二三四五六七八九十天地人你我他大小多少', icon: '📚' },
@@ -12,12 +13,14 @@ const PRESET_GROUPS = [
 export default function SettingsPage() {
   const navigate = useNavigate();
   const store = useStore();
+  const { soundEnabled, toggleSound, soundManager } = useSoundManager();
   const [inputValue, setInputValue] = useState('');
   const [chars, setChars] = useState<string[]>([...store.characters]);
 
   const masteredCount = Object.values(store.progress).filter((p) => p.bestStars >= 2).length;
 
   const handleAddChars = () => {
+    soundManager.click();
     if (!inputValue.trim()) return;
     const newChars = inputValue.match(/[\u4e00-\u9fff]/g) || [];
     if (newChars.length === 0) return;
@@ -27,22 +30,34 @@ export default function SettingsPage() {
   };
 
   const handleRemoveChar = (char: string) => {
+    soundManager.click();
     setChars(chars.filter((c) => c !== char));
   };
 
   const handleAddPreset = (presetChars: string) => {
+    soundManager.click();
     const newChars = presetChars.split('');
     const merged = [...new Set([...chars, ...newChars])];
     setChars(merged);
   };
 
   const handleClearAll = () => {
+    soundManager.click();
     setChars([]);
   };
 
   const handleSave = () => {
+    soundManager.click();
     setCharacters(chars);
     navigate(-1);
+  };
+
+  const handleToggleSound = () => {
+    toggleSound();
+    // Play a test sound when enabling
+    if (!soundEnabled) {
+      setTimeout(() => soundManager.click(), 50);
+    }
   };
 
   return (
@@ -62,7 +77,7 @@ export default function SettingsPage() {
         }}
       >
         <button
-          onClick={() => navigate(-1)}
+          onClick={() => { soundManager.click(); navigate(-1); }}
           className="w-12 h-12 rounded-full flex items-center justify-center"
           style={{ backgroundColor: '#FFF8EB', boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' }}
         >
@@ -70,6 +85,23 @@ export default function SettingsPage() {
         </button>
 
         <div className="flex items-center" style={{ gap: '16px' }}>
+          {/* 音效开关 */}
+          <button
+            onClick={handleToggleSound}
+            className="w-10 h-10 rounded-full flex items-center justify-center"
+            style={{
+              backgroundColor: soundEnabled ? '#FFF8EB' : '#F5EDDE',
+              boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)',
+            }}
+            title={soundEnabled ? '关闭音效' : '开启音效'}
+          >
+            {soundEnabled ? (
+              <Volume2 size={20} style={{ color: '#FF8800' }} />
+            ) : (
+              <VolumeX size={20} style={{ color: '#998778' }} />
+            )}
+          </button>
+
           {/* 保存按钮 */}
           <button
             onClick={handleSave}

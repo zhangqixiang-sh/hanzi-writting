@@ -2,6 +2,7 @@ import { useState, useRef, useCallback, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useStore, recordPractice } from '@/store';
 import { useHanziWriter } from '@/hooks/useHanziWriter';
+import { useSoundManager } from '@/hooks/useSoundManager';
 import { StarRating } from '@/components/StarRating';
 import { ProgressBar } from '@/components/ProgressBar';
 import { Confetti } from '@/components/Confetti';
@@ -39,6 +40,7 @@ export default function PracticePage() {
   const navigate = useNavigate();
   const store = useStore();
   const chars = store.characters;
+  const { soundManager } = useSoundManager();
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [phase, setPhase] = useState<PracticePhase>('writing');
@@ -92,6 +94,7 @@ export default function PracticePage() {
 
   // 再看一次动画
   const handleReplayAnimation = useCallback(() => {
+    soundManager.click();
     setShowReplayBtn(false);
     animateStroke();
     
@@ -99,7 +102,7 @@ export default function PracticePage() {
     setTimeout(() => {
       setShowReplayBtn(true);
     }, 2000);
-  }, [animateStroke]);
+  }, [animateStroke, soundManager]);
 
   // 自动开始书写练习
   useEffect(() => {
@@ -110,12 +113,14 @@ export default function PracticePage() {
 
     startQuiz({
       onCorrectStroke: (data) => {
+        soundManager.correct();
         setStrokeProgress({
           done: data.strokeNum + 1,
           total: data.strokeNum + 1 + data.strokesRemaining,
         });
       },
       onMistake: (data) => {
+        soundManager.wrong();
         setMistakes(data.totalMistakes);
         setStrokeProgress({
           done: data.strokeNum,
@@ -131,6 +136,7 @@ export default function PracticePage() {
         setEarnedStars(stars);
         setPhase('result');
         recordPractice(currentChar, stars, totalMistakes);
+        soundManager.complete();
 
         if (stars === 3) {
           setShowConfetti(true);
@@ -138,7 +144,7 @@ export default function PracticePage() {
         }
       },
     });
-  }, [isWriteReady, phase, startQuiz, currentChar, retryKey]);
+  }, [isWriteReady, phase, startQuiz, currentChar, retryKey, soundManager]);
 
   // Reset when character changes
   useEffect(() => {
@@ -150,29 +156,31 @@ export default function PracticePage() {
   }, [currentIndex]);
 
   const handleRetry = useCallback(() => {
+    soundManager.click();
     reset();
     setPhase('writing');
     setMistakes(0);
     setEarnedStars(0);
     setStrokeProgress({ done: 0, total: 0 });
     setRetryKey(k => k + 1);
-  }, [reset]);
+  }, [reset, soundManager]);
 
   const handleNext = useCallback(() => {
+    soundManager.click();
     if (currentIndex < chars.length - 1) {
       reset();
       setCurrentIndex(currentIndex + 1);
     } else {
       navigate('/');
     }
-  }, [currentIndex, chars.length, navigate, reset]);
+  }, [currentIndex, chars.length, navigate, reset, soundManager]);
 
   if (chars.length === 0) {
     return (
       <div className="h-full flex flex-col items-center justify-center px-10 gap-6" style={{ backgroundColor: '#FFF8EB' }}>
         <p className="text-xl font-medium" style={{ color: '#523B2B' }}>还没有设置要练习的字</p>
         <button
-          onClick={() => navigate('/settings')}
+          onClick={() => { soundManager.click(); navigate('/settings'); }}
           className="px-10 rounded-full text-lg font-medium text-white"
           style={{ 
             backgroundColor: '#FF8800', 
@@ -202,7 +210,7 @@ export default function PracticePage() {
                 borderRadius: '0 0 24px 24px',
               }}>
         <button
-          onClick={() => navigate('/')}
+          onClick={() => { soundManager.click(); navigate('/'); }}
           className="w-12 h-12 rounded-full flex items-center justify-center"
           style={{ backgroundColor: '#FFF8EB', boxShadow: '0px 4px 0px 0px rgba(230, 110, 0, 0.2)' }}
         >

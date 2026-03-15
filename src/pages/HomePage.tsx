@@ -1,10 +1,12 @@
 import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
+import { useSoundManager } from '@/hooks/useSoundManager';
 import { Settings, Star, Flame, BookOpen, Award } from 'lucide-react';
 
 export default function HomePage() {
   const navigate = useNavigate();
   const store = useStore();
+  const { soundManager } = useSoundManager();
 
   const masteredCount = Object.values(store.progress).filter((p) => p.bestStars >= 2).length;
   const pendingCount = store.characters.length;
@@ -30,7 +32,7 @@ export default function HomePage() {
 
         {/* Settings Button */}
         <button
-          onClick={() => navigate('/settings')}
+          onClick={() => { soundManager.click(); navigate('/settings'); }}
           className="w-14 h-14 rounded-full bg-white flex items-center justify-center shadow-sm"
           style={{ border: '1px solid #EBDCC8' }}
         >
@@ -57,7 +59,7 @@ export default function HomePage() {
         {/* 底部 1/3 区域 - 开始练字按钮 */}
         <div className="absolute left-1/2 -translate-x-1/2" style={{ top: '65%' }}>
           <button
-            onClick={() => navigate('/practice')}
+            onClick={() => { soundManager.click(); navigate('/practice'); }}
             className="w-80 rounded-3xl text-white text-2xl font-medium flex items-center justify-center gap-3 shadow-lg"
             style={{
               backgroundColor: '#FF8800',
