@@ -69,16 +69,33 @@ export default function SettingsPage() {
           <ArrowLeft size={24} style={{ color: '#523B2B' }} />
         </button>
 
-        <div className="flex items-center" style={{ gap: '8px' }}>
-          <div
-            className="w-10 h-10 rounded-full flex items-center justify-center"
-            style={{ backgroundColor: '#FFF8EB' }}
+        <div className="flex items-center" style={{ gap: '16px' }}>
+          {/* 保存按钮 */}
+          <button
+            onClick={handleSave}
+            className="flex items-center rounded-full text-sm font-medium"
+            style={{
+              backgroundColor: '#FF8800',
+              color: 'white',
+              padding: '8px 16px',
+              gap: '6px',
+            }}
           >
-            <Star size={18} className="fill-amber-400 text-amber-400" />
+            <Save size={16} />
+            保存
+          </button>
+
+          <div className="flex items-center" style={{ gap: '8px' }}>
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: '#FFF8EB' }}
+            >
+              <Star size={18} className="fill-amber-400 text-amber-400" />
+            </div>
+            <span className="text-base font-medium" style={{ color: '#FF8800' }}>
+              {store.totalStars}
+            </span>
           </div>
-          <span className="text-base font-medium" style={{ color: '#FF8800' }}>
-            {store.totalStars}
-          </span>
         </div>
       </header>
 
@@ -260,22 +277,22 @@ export default function SettingsPage() {
                         />
                       </div>
 
+                      <button
+                        onClick={() => handleRemoveChar(char)}
+                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center"
+                        style={{ backgroundColor: '#FF5A5A', color: 'white' }}
+                      >
+                        <X size={12} />
+                      </button>
+
                       {isMastered && (
                         <div
-                          className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center"
+                          className="absolute -bottom-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center"
                           style={{ backgroundColor: '#FFCC00', boxShadow: '0px 1px 2px rgba(0,0,0,0.1)' }}
                         >
                           <Star size={12} className="fill-white text-white" />
                         </div>
                       )}
-
-                      <button
-                        onClick={() => handleRemoveChar(char)}
-                        className="absolute -top-2 -right-2 w-6 h-6 rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
-                        style={{ backgroundColor: '#FF5A5A', color: 'white' }}
-                      >
-                        <X size={12} />
-                      </button>
                     </div>
                   );
                 })}
@@ -285,24 +302,6 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Save Button */}
-      <div className="flex justify-center" style={{ padding: '16px 32px 32px' }}>
-        <button
-          onClick={handleSave}
-          className="rounded-full text-lg font-medium flex items-center justify-center"
-          style={{
-            backgroundColor: '#F5EDDE',
-            color: '#998778',
-            border: '1px solid #EBDCC8',
-            padding: '18px 64px',
-            gap: '12px',
-            boxShadow: '0px 8px 0px 0px rgba(230, 110, 0, 0.2)',
-          }}
-        >
-          <Save size={22} />
-          保存设置
-        </button>
-      </div>
     </div>
   );
 }
